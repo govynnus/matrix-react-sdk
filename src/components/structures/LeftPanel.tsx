@@ -40,10 +40,12 @@ import { getKeyBindingsManager, RoomListAction } from "../../KeyBindingsManager"
 import UIStore from "../../stores/UIStore";
 import { findSiblingElement, IState as IRovingTabIndexState } from "../../accessibility/RovingTabIndex";
 import RoomListHeader from "../views/rooms/RoomListHeader";
+import UserMenu from "./UserMenu";
 
 interface IProps {
     isMinimized: boolean;
     resizeNotifier: ResizeNotifier;
+    showUserMenu: boolean;
 }
 
 interface IState {
@@ -341,6 +343,8 @@ export default class LeftPanel extends React.Component<IProps, IState> {
                 onBlur={this.onBlur}
                 onKeyDown={this.onKeyDown}
             >
+                { this.props.showUserMenu && <UserMenu isPanelCollapsed={true} /> }
+
                 <RoomSearch
                     isMinimized={this.props.isMinimized}
                     ref={this.roomSearchRef}
@@ -386,7 +390,12 @@ export default class LeftPanel extends React.Component<IProps, IState> {
                 <aside className="mx_LeftPanel_roomListContainer">
                     { this.renderSearchDialExplore() }
                     { this.renderBreadcrumbs() }
-                    { !this.props.isMinimized && <RoomListHeader onVisibilityChange={this.refreshStickyHeaders} /> }
+                    { !this.props.isMinimized && (
+                        <RoomListHeader
+                            onVisibilityChange={this.refreshStickyHeaders}
+                            spacePanelDisabled={this.props.showUserMenu}
+                        />
+                    ) }
                     <div className="mx_LeftPanel_roomListWrapper">
                         <div
                             className={roomListClasses}
