@@ -427,7 +427,6 @@ export default class Registration extends React.Component<IProps, IState> {
             emailAddress: this.state.formVals.email,
             phoneCountry: this.state.formVals.phoneCountry,
             phoneNumber: this.state.formVals.phoneNumber,
-            registrationToken: this.state.formVals.registrationToken,
         };
     }
 
@@ -507,7 +506,6 @@ export default class Registration extends React.Component<IProps, IState> {
                     defaultPhoneCountry={this.state.formVals.phoneCountry}
                     defaultPhoneNumber={this.state.formVals.phoneNumber}
                     defaultPassword={this.state.formVals.password}
-                    defaultRegistrationToken={this.state.formVals.registrationToken}
                     onRegisterClick={this.onFormSubmit}
                     flows={this.state.flows}
                     serverConfig={this.props.serverConfig}

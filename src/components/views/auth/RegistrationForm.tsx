@@ -44,7 +44,6 @@ enum RegistrationField {
     Username = "field_username",
     Password = "field_password",
     PasswordConfirm = "field_password_confirm",
-    RegistrationToken = "field_registration_token",
 }
 
 export const PASSWORD_MIN_SCORE = 3; // safely unguessable: moderate protection from offline slow-hash scenario.
@@ -56,7 +55,6 @@ interface IProps {
     defaultPhoneNumber?: string;
     defaultUsername?: string;
     defaultPassword?: string;
-    defaultRegistrationToken?: string;
     flows: {
         stages: string[];
     }[];
@@ -70,7 +68,6 @@ interface IProps {
         email?: string;
         phoneCountry?: string;
         phoneNumber?: string;
-        registrationToken?: string;
     }): Promise<void>;
     onEditServerDetailsClick?(): void;
 }
@@ -86,7 +83,6 @@ interface IState {
     password: string;
     passwordConfirm: string;
     passwordComplexity?: number;
-    registrationToken: string;
 }
 
 /*
@@ -111,7 +107,6 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
             password: this.props.defaultPassword || "",
             passwordConfirm: this.props.defaultPassword || "",
             passwordComplexity: null,
-            registrationToken: this.props.defaultRegistrationToken || "",
         };
 
         CountlyAnalytics.instance.track("onboarding_registration_begin");
@@ -166,7 +161,6 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
             email: email,
             phoneCountry: this.state.phoneCountry,
             phoneNumber: this.state.phoneNumber,
-            registrationToken: this.state.registrationToken,
         });
 
         if (promise) {
@@ -189,7 +183,6 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
             RegistrationField.Username,
             RegistrationField.Password,
             RegistrationField.PasswordConfirm,
-            RegistrationField.RegistrationToken,
             RegistrationField.Email,
             RegistrationField.PhoneNumber,
         ];
@@ -395,35 +388,6 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
         ],
     });
 
-    private onRegistrationTokenChange = ev => {
-        this.setState({
-            registrationToken: ev.target.value,
-        });
-    };
-
-    private onRegistrationTokenValidate = async fieldState => {
-        const result = await this.validateRegistrationTokenRules(fieldState);
-        this.markFieldValid(RegistrationField.RegistrationToken, result.valid);
-        return result;
-    };
-
-    private validateRegistrationTokenRules = withValidation({
-        description: () => _t("Use a registration token to authenticate your registration"),
-        hideDescriptionIfValid: true,
-        rules: [
-            {
-                key: "length",
-                test: ({ value }) => value.length <= 64,
-                invalid: () => _t("Registration token is more than 64 characters long"),
-            },
-            {
-                key: "permittedCharacters",
-                test: ({ value }) => !value || REGISTRATION_TOKEN_REGEX.test(value),
-                invalid: () => _t("Registration token contains unpermitted characters."),
-            },
-        ],
-    });
-
     /**
      * A step is required if all flows include that step.
      *
@@ -458,13 +422,6 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
     private showPhoneNumber() {
         const threePidLogin = !SdkConfig.get().disable_3pid_login;
         if (!threePidLogin || !this.authStepIsUsed('m.login.msisdn')) {
-            return false;
-        }
-        return true;
-    }
-
-    private showRegistrationToken() {
-        if (!this.authStepIsUsed(AuthType.RegistrationToken)) {
             return false;
         }
         return true;
@@ -556,22 +513,6 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
         />;
     }
 
-    renderRegistrationToken() {
-        if (!this.showRegistrationToken()) {
-            return null;
-        }
-        return <Field
-            id="mx_RegistrationForm_registrationToken"
-            ref={field => this[RegistrationField.RegistrationToken] = field}
-            type="text"
-            label={_t("Registration token")}
-            placeholder={_t("Registration token").toLocaleLowerCase()}
-            value={this.state.registrationToken}
-            onChange={this.onRegistrationTokenChange}
-            onValidate={this.onRegistrationTokenValidate}
-        />;
-    }
-
     render() {
         const registerButton = (
             <input className="mx_Login_submit" type="submit" value={_t("Register")} disabled={!this.props.canSubmit} />
@@ -607,9 +548,6 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
                     <div className="mx_AuthBody_fieldRow">
                         { this.renderPassword() }
                         { this.renderPasswordConfirm() }
-                    </div>
-                    <div className="mx_AuthBody_fieldRow">
-                        { this.renderRegistrationToken() }
                     </div>
                     <div className="mx_AuthBody_fieldRow">
                         { this.renderEmail() }
