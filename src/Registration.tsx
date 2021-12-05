@@ -30,6 +30,9 @@ import QuestionDialog from "./components/views/dialogs/QuestionDialog";
 // TODO: Update as needed for https://github.com/matrix-org/matrix-doc/issues/1514
 export const SAFE_LOCALPART_REGEX = /^[a-z0-9=_\-./]+$/;
 
+// Regex for what a registration token containing only valid characters would be.
+export const REGISTRATION_TOKEN_REGEX = /^[A-Za-z0-9._~-]+$/;
+
 /**
  * Starts either the ILAG or full registration flow, depending
  * on what the HS supports

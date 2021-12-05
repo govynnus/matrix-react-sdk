@@ -24,7 +24,7 @@ import { looksValid as phoneNumberLooksValid } from '../../../phonenumber';
 import Modal from '../../../Modal';
 import { _t, _td } from '../../../languageHandler';
 import SdkConfig from '../../../SdkConfig';
-import { SAFE_LOCALPART_REGEX } from '../../../Registration';
+import { SAFE_LOCALPART_REGEX, REGISTRATION_TOKEN_REGEX } from '../../../Registration';
 import withValidation, { IValidationResult } from '../elements/Validation';
 import { ValidatedServerConfig } from "../../../utils/AutoDiscoveryUtils";
 import EmailField from "./EmailField";
@@ -416,7 +416,11 @@ export default class RegistrationForm extends React.PureComponent<IProps, IState
                 test: ({ value }) => value.length <= 64,
                 invalid: () => _t("Registration token is more than 64 characters long"),
             },
-            // TODO: add check for allowed characters
+            {
+                key: "permittedCharacters",
+                test: ({ value }) => !value || REGISTRATION_TOKEN_REGEX.test(value),
+                invalid: () => _t("Registration token contains unpermitted characters."),
+            },
         ],
     });
 
